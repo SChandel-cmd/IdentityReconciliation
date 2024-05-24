@@ -1,17 +1,7 @@
 import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
 
-// Function to open a database connection
-export async function openDb() {
-  return open({
-    filename: './database.db',
-    driver: sqlite3.Database
-  });
-}
-
-// Function to initialize the database schema
 export async function initDb() {
-  const db = await openDb();
+  const db = new sqlite3.Database('./daātabase.db');
   await db.exec(`
     CREATE TABLE IF NOT EXISTS Contact (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

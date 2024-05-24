@@ -1,5 +1,14 @@
 import express, { Request, Response } from 'express';
 import { identifyHandler } from './identify';
+import { initDb } from './database';
+
+async function startServer() {
+  await initDb();
+}
+
+startServer().catch(err => {
+  console.error('Error starting server:', err);
+});
 
 const app = express();
 const PORT = 3000;
