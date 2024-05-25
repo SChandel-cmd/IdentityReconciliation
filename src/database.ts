@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 
 export async function initDb() {
-  const db = new sqlite3.Database('./daātabase.db');
+  const db = new sqlite3.Database('./database.db');
   await db.exec(`
     CREATE TABLE IF NOT EXISTS Contact (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

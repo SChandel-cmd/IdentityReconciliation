@@ -65,13 +65,13 @@ export const identifyHandler = async (req: Request, res: Response) => {
       const alreadyExistsObj = alreadyExists[0];
       if (alreadyExistsObj.linkPrecedence === 'primary') {
         response.primaryContactId = alreadyExistsObj.id.toString();
-        response.emails = (await runQuery(db, 'SELECT DISTINCT email FROM Contact WHERE linkedId = ?', [alreadyExistsObj.id])).map(row => row.email);
-        response.phoneNumbers = (await runQuery(db, 'SELECT DISTINCT phoneNumber FROM Contact WHERE linkedId = ?', [alreadyExistsObj.id])).map(row => row.phoneNumber);
+        response.emails = (await runQuery(db, 'SELECT DISTINCT email FROM Contact WHERE linkedId = ? or id = ? order by linkPrecedence asc', [alreadyExistsObj.id, alreadyExistsObj.id])).map(row => row.email);
+        response.phoneNumbers = (await runQuery(db, 'SELECT DISTINCT phoneNumber FROM Contact WHERE linkedId = ? or id = ? order by linkPrecedence asc', [alreadyExistsObj.id, alreadyExistsObj.id])).map(row => row.phoneNumber);
         response.secondaryContactIds = (await runQuery(db, 'SELECT DISTINCT id FROM Contact WHERE linkedId = ?', [alreadyExistsObj.id])).map(row => row.id);
       } else {
         response.primaryContactId = alreadyExistsObj.linkedId!.toString();
-        response.emails = (await runQuery(db, 'SELECT DISTINCT email FROM Contact WHERE linkedId = ?', [alreadyExistsObj.linkedId])).map(row => row.email);
-        response.phoneNumbers = (await runQuery(db, 'SELECT DISTINCT phoneNumber FROM Contact WHERE linkedId = ?', [alreadyExistsObj.linkedId])).map(row => row.phoneNumber);
+        response.emails = (await runQuery(db, 'SELECT DISTINCT email FROM Contact WHERE linkedId = ? or id = ? order by linkPrecedence asc', [alreadyExistsObj.linkedId, alreadyExistsObj.linkedId])).map(row => row.email);
+        response.phoneNumbers = (await runQuery(db, 'SELECT DISTINCT phoneNumber FROM Contact WHERE linkedId = ? or id = ? order by linkPrecedence asc', [alreadyExistsObj.linkedId, alreadyExistsObj.linkedId])).map(row => row.phoneNumber);
         response.secondaryContactIds = (await runQuery(db, 'SELECT DISTINCT id FROM Contact WHERE linkedId = ?', [alreadyExistsObj.linkedId])).map(row => row.id);
       }
     } else {
