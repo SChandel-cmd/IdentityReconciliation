@@ -30,13 +30,13 @@ If a customer places orders with different combinations of email and phone numbe
    git clone <repository-url>
    ```
 2. Install dependencies
-  ```sh
+   ```sh
    npm install
-  ```
+   ```
 3. Run the server
-  ```sh
-  npx ts-node src/index.ts
-  ```
+   ```sh
+   npx ts-node src/index.ts
+   ```
 ## Usage
 The server can be accessed at https://identityreconciliation-ondo.onrender.com/identify. To identify customer identities, make a POST request to this endpoint with the following JSON structure:
   ```json
@@ -45,3 +45,4 @@ The server can be accessed at https://identityreconciliation-ondo.onrender.com/i
   "phoneNumber": "1234567890"
   }
   ```
+## PS. My resume is also available in the root folder.
