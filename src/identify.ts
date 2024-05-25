@@ -59,38 +59,46 @@ export const identifyHandler = async (req: Request, res: Response) => {
     
     let idCheck: number;
     if (alreadyExists.length > 0) {
+      //case where exact user already exists
       const alreadyExistsObj = alreadyExists[0];
       if (alreadyExistsObj.linkPrecedence === 'primary') {
+        //existing user is primary
         idCheck = alreadyExistsObj.id;
       } else {
+        //existing user is secondary
         idCheck = alreadyExistsObj.linkedId;
       }
     } else {
+      //case where exact user does not exist
       const primaryPhone = commonPhoneNumber.filter(c => c.linkPrecedence === 'primary');
       const primaryEmail = commonEmail.filter(c => c.linkPrecedence === 'primary');
 
       if (primaryEmail.length > 0 && primaryPhone.length > 0) {
-        let obj: Contact;
+        //case where primary users exist with same phone and also same email
+        //make the user with newer sign in date secondary 
         if (new Date(primaryEmail[0].createdAt) > new Date(primaryPhone[0].createdAt)) {
           idCheck = primaryPhone[0].id;
-          await runCommand(db, 'UPDATE Contact SET linkedId = ?, linkPrecedence = ? WHERE id = ?', [idCheck, 'secondary', idCheck]);
         } else {
           idCheck = primaryEmail[0].id;
-          await runCommand(db, 'UPDATE Contact SET linkedId = ?, linkPrecedence = ? WHERE id = ?', [idCheck, 'secondary', idCheck]);
         }
+        await runCommand(db, 'UPDATE Contact SET linkedId = ?, linkPrecedence = ? WHERE id = ?', [idCheck, 'secondary', idCheck]);
+
       } else if (commonEmail.length > 0) {
+        //case where user already existed with same email
         const primaryCommonEmail = await runQuery(db, 'SELECT * FROM Contact WHERE (linkPrecedence = ? AND email = ?) OR id = ?', ['primary', email, commonEmail[0].linkedId]);
         if (phoneNumber) {
           await runCommand(db, 'INSERT INTO Contact (phoneNumber, email, linkedId, linkPrecedence) VALUES (?, ?, ?, ?)', [phoneNumber, email, primaryCommonEmail[0].id, 'secondary']);
         }
         idCheck = primaryCommonEmail[0].id;
       } else if (commonPhoneNumber.length > 0) {
+        //case where user already existing with same phone number
         const primaryCommonPhoneNumber = await runQuery(db, 'SELECT * FROM Contact WHERE (linkPrecedence = ? AND phoneNumber = ?) OR id = ?', ['primary', phoneNumber, commonPhoneNumber[0].linkedId]);
         if (email) {
           await runCommand(db, 'INSERT INTO Contact (phoneNumber, email, linkedId, linkPrecedence) VALUES (?, ?, ?, ?)', [phoneNumber, email, primaryCommonPhoneNumber[0].id, 'secondary']);
         }
         idCheck = primaryCommonPhoneNumber[0].id;
       } else {
+        //case where fresh user
         const result = await runCommand(db, 'INSERT INTO Contact (phoneNumber, email, linkPrecedence) VALUES (?, ?, ?)', [phoneNumber, email, 'primary']);
         idCheck = result.lastID;
       }
