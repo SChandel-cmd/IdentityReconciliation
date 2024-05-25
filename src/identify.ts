@@ -76,12 +76,16 @@ export const identifyHandler = async (req: Request, res: Response) => {
       if (primaryEmail.length > 0 && primaryPhone.length > 0) {
         //case where primary users exist with same phone and also same email
         //make the user with newer sign in date secondary 
+        let otherIdCheck : number;
         if (new Date(primaryEmail[0].createdAt) > new Date(primaryPhone[0].createdAt)) {
           idCheck = primaryPhone[0].id;
+          otherIdCheck = primaryEmail[0].id;
         } else {
           idCheck = primaryEmail[0].id;
+          otherIdCheck = primaryPhone[0].id;
         }
-        await runCommand(db, 'UPDATE Contact SET linkedId = ?, linkPrecedence = ? WHERE id = ?', [idCheck, 'secondary', idCheck]);
+        await runCommand(db, 'UPDATE Contact SET linkedId = ?, linkPrecedence = ? WHERE id = ?', [idCheck, 'secondary', otherIdCheck]);
+        await runCommand(db, 'UPDATE Contact SET linkedId = ? WHERE linkedId = ?', [idCheck, otherIdCheck]);
 
       } else if (commonEmail.length > 0) {
         //case where user already existed with same email
